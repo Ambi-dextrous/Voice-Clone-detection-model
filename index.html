@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Voice Detector</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+font-family:Arial;
+background:#070a16;
+color:white;
+min-height:100vh;
+}
+
+header{
+height:80px;
+border-bottom:1px solid #242a45;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 8%;
+}
+
+.logo{font-size:27px;font-weight:bold}
+.logo span{color:#7065ff}
+nav{color:#9ca4c4}
+
+main{
+width:80%;
+max-width:850px;
+margin:auto;
+text-align:center;
+}
+
+.hero{padding:55px 0 35px}
+
+.badge{
+display:inline-block;
+padding:10px 18px;
+border:1px solid #4949c9;
+border-radius:25px;
+color:#9188ff;
+}
+
+h1{
+font-size:55px;
+margin:20px 0 15px;
+}
+
+h1 span{color:#7569ff}
+
+.subtitle{
+color:#a7aec9;
+font-size:17px;
+line-height:1.6;
+}
+
+.upload{
+display:block;
+width:100%;
+height:230px;
+border:2px dashed #5361dc;
+border-radius:17px;
+background:#0d1225;
+padding:30px;
+cursor:pointer;
+}
+
+.upload:hover{
+background:#111733;
+}
+
+.mic{
+font-size:38px;
+margin-bottom:12px;
+}
+
+.upload h2{font-size:23px}
+.upload p{
+color:#9da5c4;
+margin-top:8px;
+}
+
+#file{display:none}
+
+.file{
+display:none;
+margin-top:15px;
+padding:18px;
+background:#11172b;
+border:1px solid #30385b;
+border-radius:12px;
+text-align:left;
+}
+
+.file-name{font-weight:bold}
+.file-size{color:#858da9;font-size:13px;margin-top:5px}
+
+audio{
+width:100%;
+margin-top:15px;
+}
+
+button{
+width:100%;
+height:60px;
+margin-top:20px;
+border:0;
+border-radius:13px;
+background:linear-gradient(90deg,#704dff,#356cf5);
+color:white;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:disabled{
+background:#30364e;
+color:#999fb3;
+cursor:not-allowed;
+}
+
+.loading,.result{display:none}
+
+.loading{margin-top:25px;color:#9da5c4}
+
+.result{
+margin-top:25px;
+padding:30px;
+background:#10152a;
+border:1px solid #30385b;
+border-radius:16px;
+}
+
+.status{
+font-size:30px;
+font-weight:bold;
+margin:10px;
+}
+
+.score{
+font-size:42px;
+color:#776cff;
+font-weight:bold;
+}
+
+.bar{
+height:8px;
+background:#282e49;
+border-radius:10px;
+margin-top:10px;
+overflow:hidden;
+}
+
+.fill{
+height:100%;
+width:0;
+background:#6f61ff;
+transition:1s;
+}
+
+.note{
+margin:25px auto;
+color:#68718f;
+font-size:12px;
+}
+
+@media(max-width:600px){
+h1{font-size:40px}
+main{width:90%}
+nav{display:none}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">Voice<span>Detector</span></div>
+<nav>AI Audio Authenticity</nav>
+</header>
+
+<main>
+
+<div class="hero">
+
+<div class="badge">◈ AI-Powered Audio Verification</div>
+
+<h1>Is this voice <span>real?</span></h1>
+
+<p class="subtitle">
+Upload an audio recording and analyze it for signs of
+AI voice cloning, synthetic speech, and manipulation.
+</p>
+
+</div>
+
+<label class="upload" for="file">
+
+<div class="mic">🎙</div>
+
+<h2>Drop your audio here</h2>
+
+<p>or click to browse your computer</p>
+
+<p>MP3, WAV, M4A, OGG supported</p>
+
+</label>
+
+<input id="file" type="file" accept="audio/*">
+
+
+<div class="file" id="fileBox">
+
+<div class="file-name" id="name"></div>
+<div class="file-size" id="size"></div>
+
+<audio id="audio" controls></audio>
+
+</div>
+
+
+<button id="analyze" disabled>
+♫ &nbsp; Analyze Audio
+</button>
+
+
+<div class="loading" id="loading">
+Analyzing acoustic features...
+</div>
+
+
+<div class="result" id="result">
+
+<div>ANALYSIS RESULT</div>
+
+<div class="status" id="status">
+Potentially AI Cloned
+</div>
+
+<div class="score">
+<span id="score">87</span>%
+</div>
+
+<div>Detection Confidence</div>
+
+<div class="bar">
+<div class="fill" id="fill"></div>
+</div>
+
+</div>
+
+
+<p class="note">
+This is a proof-of-concept. Analysis is currently simulated.
+</p>
+
+</main>
+
+
+<script>
+
+let file = document.getElementById("file");
+let box = document.getElementById("fileBox");
+let audio = document.getElementById("audio");
+let analyze = document.getElementById("analyze");
+
+file.onchange = function(){
+
+if(!this.files[0]) return;
+
+let f = this.files[0];
+
+document.getElementById("name").innerText = f.name;
+
+document.getElementById("size").innerText =
+(f.size/1024).toFixed(1) + " KB";
+
+audio.src = URL.createObjectURL(f);
+
+box.style.display = "block";
+
+analyze.disabled = false;
+
+};
+
+
+analyze.onclick = function(){
+
+analyze.disabled = true;
+
+document.getElementById("loading").style.display = "block";
+
+document.getElementById("result").style.display = "none";
+
+
+setTimeout(function(){
+
+let ai = Math.random() > .5;
+let score = Math.floor(Math.random()*16)+82;
+
+document.getElementById("status").innerText =
+ai ? "Potentially AI Cloned" : "Likely Authentic";
+
+document.getElementById("score").innerText = score;
+
+document.getElementById("loading").style.display = "none";
+
+document.getElementById("result").style.display = "block";
+
+setTimeout(function(){
+document.getElementById("fill").style.width = score+"%";
+},100);
+
+analyze.disabled = false;
+
+},1500);
+
+};
+
+</script>
+
+</body>
+</html>
